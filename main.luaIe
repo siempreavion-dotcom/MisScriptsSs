@@ -24,7 +24,7 @@ local IsLocked = false
 local LockedTarget = nil 
 local Visible = true
 
--- [ INTERFAZ PROTEGIDA ]
+
 local ScreenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
 ScreenGui.Name = "KOOZE_" .. math.random(100,999)
 
