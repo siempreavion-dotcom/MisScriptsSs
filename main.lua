@@ -38,7 +38,7 @@ LineaAzul.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
 LineaAzul.BorderSizePixel = 0
 
 local Title = Instance.new("TextLabel", TopBar)
-Title.Text = "  ▼  Koda.cc"
+Title.Text = "  KOOZE"
 Title.Font = Enum.Font.Code
 Title.TextColor3 = Color3.new(1,1,1)
 Title.BackgroundTransparency = 1
