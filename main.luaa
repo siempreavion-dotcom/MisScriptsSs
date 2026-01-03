@@ -1,0 +1,49 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+-- Crear la ventana principal
+local Window = Rayfield:CreateWindow({
+   Name = "Mi Script Personalizado",
+   LoadingTitle = "Cargando Interfaz...",
+   LoadingSubtitle = "por TuNombre",
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = "MisConfiguraciones", 
+      FileName = "Configuracion1"
+   }
+})
+
+-- Crear una pestaña (como 'Main' o 'Silent Aim' en tu foto)
+local MainTab = Window:CreateTab("Principal", 4483362458) -- El número es un icono
+
+-- 2. AGREGAR BOTONES Y FUNCIONES
+-- Aquí es donde agregas lo que tú quieras:
+
+MainTab:CreateButton({
+   Name = "Activar Camlock",
+   Callback = function()
+      -- AQUÍ pones tu código de Camlock
+      print("Camlock activado")
+   end,
+})
+
+MainTab:CreateToggle({
+   Name = "Sticky Aim",
+   CurrentValue = false,
+   Flag = "Toggle1", 
+   Callback = function(Value)
+      -- 'Value' será true o false
+      print("Sticky Aim está:", Value)
+   end,
+})
+
+MainTab:CreateSlider({
+   Name = "X Prediction",
+   Range = {0, 1},
+   Increment = 0.01,
+   Suffix = "Vel",
+   CurrentValue = 0.1,
+   Flag = "Slider1",
+   Callback = function(Value)
+      -- Aquí ajustas la predicción
+   end,
+})
