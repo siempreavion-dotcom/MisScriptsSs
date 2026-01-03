@@ -4,18 +4,20 @@ local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
 
--- Variables de Camlock
-local CamlockState = false
+-- Variables de Estado
+local CamlockActive = false
+local CamlockKey = Enum.KeyCode.E -- Tecla por defecto para activar Camlock
+local MenuKey = Enum.KeyCode.Insert -- Tecla para abrir/cerrar el menú
 local TargetPart = "Head"
+local Visible = true
 
--- Interfaz Base
+-- Interfaz
 local ScreenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
 local MainFrame = Instance.new("Frame", ScreenGui)
 local TopBar = Instance.new("Frame", MainFrame)
-local TabsFrame = Instance.new("Frame", MainFrame)
 local ContentFrame = Instance.new("Frame", MainFrame)
 
--- Estilo Visual (Basado en imagen)
+-- Diseño Visual (Estilo Koda.cc)
 MainFrame.Size = UDim2.new(0, 450, 0, 300)
 MainFrame.Position = UDim2.new(0.5, -225, 0.5, -150)
 MainFrame.BackgroundColor3 = Color3.fromRGB(11, 14, 17)
@@ -26,73 +28,46 @@ TopBar.Size = UDim2.new(1, 0, 0, 30)
 TopBar.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 TopBar.BorderSizePixel = 0
 
--- Título y Flecha
 local Title = Instance.new("TextLabel", TopBar)
-Title.Text = "  ▼  Koda.cc"
+Title.Text = "  ▼  KOOZE"
 Title.Font = Enum.Font.Code
 Title.TextColor3 = Color3.new(1,1,1)
 Title.BackgroundTransparency = 1
 Title.Size = UDim2.new(1, 0, 1, 0)
 Title.TextXAlignment = Enum.TextXAlignment.Left
 
--- Sistema de Arrastre (Drag) Totalmente Funcional
-local dragging, dragStart, startPos
-TopBar.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = true
-        dragStart = input.Position
-        startPos = MainFrame.Position
-    end
-end)
-
-UserInputService.InputChanged:Connect(function(input)
-    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local delta = input.Position - dragStart
-        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-end)
-
-UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = false
-    end
-end)
-
--- Pestañas
-TabsFrame.Size = UDim2.new(1, 0, 0, 25)
-TabsFrame.Position = UDim2.new(0, 0, 0, 30)
-TabsFrame.BackgroundColor3 = Color3.fromRGB(16, 21, 26)
-TabsFrame.BorderSizePixel = 0
-
-local layout = Instance.new("UIListLayout", TabsFrame)
-layout.FillDirection = Enum.FillDirection.Horizontal
-
-ContentFrame.Size = UDim2.new(1, -20, 1, -65)
-ContentFrame.Position = UDim2.new(0, 10, 0, 60)
+ContentFrame.Size = UDim2.new(1, -20, 1, -40)
+ContentFrame.Position = UDim2.new(0, 10, 0, 40)
 ContentFrame.BackgroundTransparency = 1
+local layout = Instance.new("UIListLayout", ContentFrame)
+layout.Padding = UDim.new(0, 5)
 
-local contentLayout = Instance.new("UIListLayout", ContentFrame)
-contentLayout.Padding = UDim.new(0, 5)
-
--- FUNCIONES DEL MENÚ (CAMLOCK)
-local function CreateToggle(text, callback)
+-- 1. SISTEMA PARA CAMBIAR TECLA (KEYBIND)
+local function CreateKeybind(text, defaultKey, callback)
     local btn = Instance.new("TextButton", ContentFrame)
     btn.Size = UDim2.new(1, 0, 0, 30)
     btn.BackgroundColor3 = Color3.fromRGB(20, 25, 30)
-    btn.Text = "  [ OFF ] " .. text
+    btn.Text = "  " .. text .. ": " .. defaultKey.Name
     btn.TextColor3 = Color3.new(0.8, 0.8, 0.8)
     btn.Font = Enum.Font.Code
     btn.TextXAlignment = Enum.TextXAlignment.Left
     
-    local state = false
+    local listening = false
     btn.MouseButton1Click:Connect(function()
-        state = not state
-        btn.Text = state and "  [ ON ]  " .. text or "  [ OFF ] " .. text
-        btn.TextColor3 = state and Color3.fromRGB(0, 170, 255) or Color3.new(0.8, 0.8, 0.8)
-        callback(state)
+        listening = true
+        btn.Text = "  " .. text .. ": [Presiona una tecla...]"
+    end)
+    
+    UserInputService.InputBegan:Connect(function(input)
+        if listening and input.UserInputType == Enum.UserInputType.Keyboard then
+            listening = false
+            btn.Text = "  " .. text .. ": " .. input.KeyCode.Name
+            callback(input.KeyCode)
+        end
     end)
 end
 
+-- 2. SELECTOR DE PARTE DEL CUERPO
 local function CreateSelector(options, callback)
     local btn = Instance.new("TextButton", ContentFrame)
     btn.Size = UDim2.new(1, 0, 0, 30)
@@ -110,12 +85,46 @@ local function CreateSelector(options, callback)
     end)
 end
 
--- Lógica de Camlock Real
+-- 3. LÓGICA DE ABRIR/CERRAR CON INSERT
+UserInputService.InputBegan:Connect(function(input)
+    if input.KeyCode == MenuKey then
+        Visible = not Visible
+        MainFrame.Visible = Visible
+    end
+end)
+
+-- 4. LÓGICA DE ACTIVAR CAMLOCK CON TECLA SELECCIONADA
+UserInputService.InputBegan:Connect(function(input)
+    if input.KeyCode == CamlockKey then
+        CamlockActive = not CamlockActive
+        print("Camlock: " .. tostring(CamlockActive))
+    end
+end)
+
+-- 5. LÓGICA DE ARRASTRE
+local dragging, dragStart, startPos
+TopBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
+    end
+end)
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
+end)
+
+-- 6. MOTOR DEL CAMLOCK
 RunService.RenderStepped:Connect(function()
-    if CamlockState then
+    if CamlockActive then
         local target = nil
         local shortestDist = math.huge
-        
         for _, v in pairs(Players:GetPlayers()) do
             if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild(TargetPart) then
                 local pos, onScreen = workspace.CurrentCamera:WorldToViewportPoint(v.Character[TargetPart].Position)
@@ -128,15 +137,12 @@ RunService.RenderStepped:Connect(function()
                 end
             end
         end
-        
         if target then
             workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, target.Position)
         end
     end
 end)
 
--- Agregar botones al GUI
-CreateToggle("Camlock", function(s) CamlockState = s end)
+-- Inicializar Botones
+CreateKeybind("Camlock Key", CamlockKey, function(newKey) CamlockKey = newKey end)
 CreateSelector({"Head", "Torso", "HumanoidRootPart"}, function(p) TargetPart = p end)
-
-print("Koda Menu Cargado: Usa la barra negra para arrastrar.")
