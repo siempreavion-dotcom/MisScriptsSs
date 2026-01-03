@@ -1,49 +1,75 @@
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local TopBar = Instance.new("Frame")
+local Title = Instance.new("TextLabel")
+local TabsFrame = Instance.new("Frame")
+local ContentFrame = Instance.new("Frame")
+local UIListLayout = Instance.new("UIListLayout")
 
--- Crear la ventana principal
-local Window = Rayfield:CreateWindow({
-   Name = "Mi Script Personalizado",
-   LoadingTitle = "Cargando Interfaz...",
-   LoadingSubtitle = "por TuNombre",
-   ConfigurationSaving = {
-      Enabled = true,
-      FolderName = "MisConfiguraciones", 
-      FileName = "Configuracion1"
-   }
-})
+-- Propiedades del ScreenGui
+ScreenGui.Parent = game.CoreGui -- Se pone en CoreGui para que no se borre al morir
+ScreenGui.Name = "KodaClone"
 
--- Crear una pestaña (como 'Main' o 'Silent Aim' en tu foto)
-local MainTab = Window:CreateTab("Principal", 4483362458) -- El número es un icono
+-- Marco Principal (Negro/Azul muy oscuro)
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(10, 15, 20)
+MainFrame.BorderSizePixel = 0
+MainFrame.Position = UDim2.new(0.5, -225, 0.5, -150)
+MainFrame.Size = UDim2.new(0, 450, 0, 300)
 
--- 2. AGREGAR BOTONES Y FUNCIONES
--- Aquí es donde agregas lo que tú quieras:
+-- Barra Superior
+TopBar.Name = "TopBar"
+TopBar.Parent = MainFrame
+TopBar.BackgroundColor3 = Color3.fromRGB(5, 5, 5)
+TopBar.Size = UDim2.new(1, 0, 0, 30)
 
-MainTab:CreateButton({
-   Name = "Activar Camlock",
-   Callback = function()
-      -- AQUÍ pones tu código de Camlock
-      print("Camlock activado")
-   end,
-})
+Title.Parent = TopBar
+Title.BackgroundTransparency = 1
+Title.Position = UDim2.new(0, 10, 0, 0)
+Title.Size = UDim2.new(1, -10, 1, 0)
+Title.Font = Enum.Font.Code
+Title.Text = "▼ Koda.cc"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 16
+Title.TextXAlignment = Enum.TextXAlignment.Left
 
-MainTab:CreateToggle({
-   Name = "Sticky Aim",
-   CurrentValue = false,
-   Flag = "Toggle1", 
-   Callback = function(Value)
-      -- 'Value' será true o false
-      print("Sticky Aim está:", Value)
-   end,
-})
+-- Contenedor de Pestañas (Main, Silent Aim, etc)
+TabsFrame.Name = "TabsFrame"
+TabsFrame.Parent = MainFrame
+TabsFrame.BackgroundColor3 = Color3.fromRGB(15, 20, 25)
+TabsFrame.Position = UDim2.new(0, 0, 0, 30)
+TabsFrame.Size = UDim2.new(1, 0, 0, 25)
 
-MainTab:CreateSlider({
-   Name = "X Prediction",
-   Range = {0, 1},
-   Increment = 0.01,
-   Suffix = "Vel",
-   CurrentValue = 0.1,
-   Flag = "Slider1",
-   Callback = function(Value)
-      -- Aquí ajustas la predicción
-   end,
-})
+UIListLayout.Parent = TabsFrame
+UIListLayout.FillDirection = Enum.FillDirection.Horizontal
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+-- Cuerpo del Script (Donde agregarás tus funciones)
+ContentFrame.Name = "ContentFrame"
+ContentFrame.Parent = MainFrame
+ContentFrame.BackgroundColor3 = Color3.fromRGB(12, 18, 24)
+ContentFrame.Position = UDim2.new(0, 5, 0, 60)
+ContentFrame.Size = UDim2.new(1, -10, 1, -65)
+ContentFrame.BorderSizePixel = 0
+
+-- Función para añadir pestañas rápidamente
+local function AddTab(name)
+	local Tab = Instance.new("TextButton")
+	Tab.Parent = TabsFrame
+	Tab.BackgroundTransparency = 1
+	Tab.Size = UDim2.new(0, 80, 1, 0)
+	Tab.Font = Enum.Font.SourceSans
+	Tab.Text = name
+	Tab.TextColor3 = Color3.fromRGB(150, 150, 150)
+	Tab.TextSize = 15
+	
+	Tab.MouseButton1Click:Connect(function()
+		print("Cambiando a pestaña: " .. name)
+	end)
+end
+
+-- Creamos las pestañas vacías como en la foto
+AddTab("Main")
+AddTab("Silent Aim")
+AddTab("Rage")
